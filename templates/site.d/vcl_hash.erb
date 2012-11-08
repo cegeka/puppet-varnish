@@ -1,0 +1,5 @@
+sub vcl_hash {
+  if (req.http.Cookie) {
+    set req.hash += req.http.Cookie;
+  }
+}
