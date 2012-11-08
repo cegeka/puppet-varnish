@@ -1,0 +1,6 @@
+sub vcl_fetch {
+  if (req.url ~ "\.(png|gif|jpg|swf|css|js)$") {
+    unset beresp.http.set-cookie;
+  }
+  esi;
+}

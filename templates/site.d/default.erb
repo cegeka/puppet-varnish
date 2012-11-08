@@ -1,0 +1,5 @@
+#file manager by puppet, do not edit
+backend <%= instance %> {
+  <% options.each do |option| %>.<%= option %>;<% end %>
+}
+include /etc/varnish/<%= instance %>/*.vcl
