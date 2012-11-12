@@ -5,74 +5,7 @@ backend default {
 <% end %>
 }
 
-
-sub vcl_error {
-  set obj.http.Content-Type = "text/html; charset=utf-8";
-  synthetic {"
-  <?xml version="1.0" encoding="utf-8"?>
-  <html>
-    <head>
-      <title>"} obj.status " " obj.response {"</title>
-      <style type="text/css">
-      #page {width: 400px; padding: 10px; margin: 20px auto; border: 1px solid black; background-color: #FFF;}
-      p {margin-left:20px;}
-      body {background-color: #DDD; margin: auto;}
-      </style>
-    </head>
-    <body>
-    <div id="page">
-    <h1>Page Could Not Be Loaded</h1>
-    <p>We're very sorry, but the page could not be loaded properly. This should be fixed very soon, and we apologize for any inconvenience.</p>
-    <hr />
-    <h4>Debug Info:</h4>
-    <pre>
-Status: "} obj.status {"
-Response: "} obj.response {"
-XID: "} req.xid {"
-</pre>
-      </div>
-    </body>
-   </html>
-   "};
-   return(deliver);
-}
-sub vcl_fetch {
-  if (req.url ~ "\.(png|gif|jpg|swf|css|js)$") {
-    unset beresp.http.set-cookie;
-  }
-  esi;
-}
-sub vcl_hash {
-  if (req.http.Cookie) {
-    set req.hash += req.http.Cookie;
-  }
-}
-sub vcl_recv {
-
-  set req.http.Cookie = regsuball(req.http.Cookie, "(^|;\s*)(__[a-z]+|has_js)=[^;]*", "");
-  set req.http.Cookie = regsub(req.http.Cookie, "^;\s*", "");
-  if (req.http.Cookie ~ "^\s*$") {
-    unset req.http.Cookie;
-  }
-
-  if (req.url ~ "install\.php|update\.php") {
-    return (pass);
-  }
-
-  if (req.http.Accept-Encoding) {
-    if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
-      # No point in compressing these
-      remove req.http.Accept-Encoding;
-    } elsif (req.http.Accept-Encoding ~ "gzip") {
-      set req.http.Accept-Encoding = "gzip";
-   } elsif (req.http.Accept-Encoding ~ "deflate") {
-      set req.http.Accept-Encoding = "deflate";
-    } else {
-      # unkown algorithm
-      remove req.http.Accept-Encoding;
-    }
-  }
-
-  set req.grace = 30s;
-
-}
+include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_error.vcl
+include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_fetch.vcl
+include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_hash.vcl
+include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_recv.vcl
