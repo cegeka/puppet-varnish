@@ -81,28 +81,33 @@ define varnish::instance(
     ensure  => present,
     content => template('varnish/site.d/vcl_error.erb'),
     notify  => Service["varnish-${instance}"],
-    require => Package['varnish'],
+    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
   file { "/etc/varnish/${instance}/vcl_fetch.vcl":
     ensure  => present,
     content => template('varnish/site.d/vcl_fetch.erb'),
     notify  => Service["varnish-${instance}"],
-    require => Package['varnish'],
+    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
   file { "/etc/varnish/${instance}/vcl_hash.vcl":
     ensure  => present,
     content => template('varnish/site.d/vcl_fetch.erb'),
     notify  => Service["varnish-${instance}"],
-    require => Package['varnish'],
+    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
   file { "/etc/varnish/${instance}/vcl_recv.vcl":
     ensure  => present,
     content => template('varnish/site.d/vcl_fetch.erb'),
     notify  => Service["varnish-${instance}"],
-    require => Package['varnish'],
+    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
 
   file { "/var/lib/varnish/${instance}":
+    ensure  => directory,
+    owner   => 'root',
+    require => Package['varnish'],
+  }
+  file { "/etc/varnish/${instance}":
     ensure  => directory,
     owner   => 'root',
     require => Package['varnish'],
