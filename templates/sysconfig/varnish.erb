@@ -43,8 +43,8 @@ DAEMON_OPTS="-n <%= name %> \
              -s <%= storage %> \
 <% end -%>
 <% end -%>
--f /etc/varnish/<%= name %>.vcl \
-<% if backend != false -%>
+            -f /etc/varnish/<%= name %>.vcl \
+<% if @backend -%>
              -b <%= backend %> \
 <% end -%>
 <% if @cliparams %><% cliparams.each do |param| -%>
