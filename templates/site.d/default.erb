@@ -5,7 +5,7 @@ backend default {
 <% end %>
 }
 
-include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_error.vcl
-include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_fetch.vcl
-include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_hash.vcl
-include <%= scope.lookupvar('nginx::params::nginx_sites_enabled')%>/<%= name %>.d/vcl_recv.vcl
+include /etc/varnish/<%= instance %>/vcl_error.vcl
+include /etc/varnish/<%= instance %>/vcl_fetch.vcl
+include /etc/varnish/<%= instance %>/vcl_hash.vcl
+include /etc/varnish/<%= instance %>/vcl_recv.vcl
