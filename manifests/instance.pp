@@ -52,7 +52,7 @@ define varnish::instance(
   $memlock='82000',
   $corelimit='0',
   $varnishlog=true,
-  $cliparams=undef
+  $cliparams=undef,
 ) {
 
   # use a more comprehensive attribute name for ERB templates.
@@ -91,13 +91,13 @@ define varnish::instance(
   }
   file { "/etc/varnish/${instance}/vcl_hash.vcl":
     ensure  => present,
-    content => template('varnish/site.d/vcl_fetch.erb'),
+    content => template('varnish/site.d/vcl_hash.erb'),
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
   file { "/etc/varnish/${instance}/vcl_recv.vcl":
     ensure  => present,
-    content => template('varnish/site.d/vcl_fetch.erb'),
+    content => template('varnish/site.d/vcl_recv.erb'),
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
