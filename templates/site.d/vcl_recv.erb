@@ -6,6 +6,9 @@ sub vcl_recv {
     unset req.http.Cookie;
   }
 
+  remove req.http.X-Forwarded-For;
+  set req.http.X-Forwarded-For = client.ip; 
+
   if (req.url ~ "install\.php|update\.php") {
     return (pass);
   }
