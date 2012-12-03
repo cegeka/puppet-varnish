@@ -10,5 +10,5 @@ varnish::instance { 'site.example.com':
     'first_byte_timeout = 600s',
     'between_bytes_timeout = 600s'
   ],
-  storage   => ['file,/var/lib/varnish/varnish_storage.bin,1G'],
+  storage    => ['file,/var/lib/varnish/varnish_storage.bin,1G'],
 }
