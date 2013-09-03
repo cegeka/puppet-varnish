@@ -48,7 +48,7 @@ class varnish {
           'set /rule/rotate 7',
           'set /rule/compress compress',
           'set /rule/delaycompress delaycompress',
-          'set /rule/postrotate "for service in varnishlog varnishncsa; do if /usr/bin/pgrep -P 1 $service >/dev/null; then /usr/bin/pkill -HUP $service 2>/dev/null; fi; done"',
+          'set /rule/postrotate "for service in varnishlog varnishncsa varnishd; do if /usr/bin/pgrep -P 1 $service >/dev/null; then /usr/bin/pkill -HUP $service 2>/dev/null; fi; done"',
         ],
         require => Package['varnish'],
       }
