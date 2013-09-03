@@ -42,6 +42,7 @@ class varnish {
       # https://bugzilla.redhat.com/show_bug.cgi?id=554745
       augeas { 'logrotate config for varnishlog and varnishncsa':
         incl    => '/etc/logrotate.d/varnish',
+        context => '/files/etc/logrotate.d/varnish',
         lens    => 'Logrotate.lns',
         changes => [
           'set /rule/schedule daily',
