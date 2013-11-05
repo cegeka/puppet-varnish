@@ -1,0 +1,14 @@
+/var/log/varnish/*.log {
+    daily
+    rotate 7
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    delaycompress
+    postrotate
+        for service in varnishlog varnishd; do if /usr/bin/pgrep -P 1 $service >/dev/null; then /usr/bin/pkill -HUP $service 2>/dev/null; fi; done
+        #/bin/kill -HUP `cat /var/run/varnishlog.pid 2>/dev/null` 2> /dev/null || true
+        #/bin/kill -HUP `cat /var/run/varnishncsa.pid 2>/dev/null` 2> /dev/null || true
+    endscript
+}
