@@ -1,14 +1,22 @@
-/*
+#
+#
+#== Class: varnish
+#
+#Installs the varnish http accelerator and stops the varnishd and varnishlog
+#services, because they are handled separately by varnish::instance.
+#
+#
+class varnish($release=undef) {
 
-== Class: varnish
+  if $release {
+    $real_release = $release
+  } else {
+    $real_release = $epel_release
+  }
 
-Installs the varnish http accelerator and stops the varnishd and varnishlog
-services, because they are handled separately by varnish::instance.
-
-*/
-class varnish {
-
-  package { 'varnish': ensure => present }
+  package { 'varnish':
+    ensure => $real_release,
+  }
 
   service { 'varnish':
     ensure    => 'stopped',
@@ -36,6 +44,17 @@ class varnish {
 
   case $::operatingsystem {
     RedHat,CentOS,Amazon: {
+      case $::operatingsystemrelease {
+        /^5./: {
+          $epel_release = '2.0.6'
+        }
+        /^6./: {
+          $epel_release = '2.1.5'
+        }
+        default: {
+          $epel_release = ''
+        }
+      }
       # By default RPM package fail to send HUP to varnishlog process, and don't
       # bother compressing rotated files. This fixes these issues, waiting for
       # this bug to get corrected upstream:

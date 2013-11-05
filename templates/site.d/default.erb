@@ -5,7 +5,8 @@ backend default {
 <% end %>
 }
 
-include "/etc/varnish/<%= instance %>/vcl_error.vcl";
-include "/etc/varnish/<%= instance %>/vcl_fetch.vcl";
-include "/etc/varnish/<%= instance %>/vcl_hash.vcl";
-include "/etc/varnish/<%= instance %>/vcl_recv.vcl";
+include "/etc/varnish/<%= instance %>/production-<%= release %>.vcl";
+# include "/etc/varnish/<%= instance %>/vcl_error.vcl";
+# include "/etc/varnish/<%= instance %>/vcl_fetch.vcl";
+# include "/etc/varnish/<%= instance %>/vcl_hash.vcl";
+# include "/etc/varnish/<%= instance %>/vcl_recv.vcl";
