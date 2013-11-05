@@ -1,46 +1,46 @@
-/*
+#
+#
+#== Definition: varnish::instance
+#
+#Creates a running varnishd instance and configures it's different startup
+#parameters. Optionnally a VCL configuration file can be provided. Have a look
+#at http://varnish.projects.linpro.no/wiki/Introduction for more details.
+#
+#
+#Parameters:
+#- *address*: array of ip + port which varnish's http service should bindto,
+#  defaults to all interfaces on port 80.
+#- *admin_address*: address of varnish's admin console, defaults to localhost.
+#- *admin_port*: port of varnish's admin console, defaults to 6082.
+#- *backend*: location of the backend, in the "address:port" format. This is
+#  passed to "varnishd -b". Defaults to none.
+#- *vcl_file*: location of the instance's VCL file, located on puppet's
+#  fileserver (puppet://host/module/path.vcl). This is passed to "varnishd -f".
+#  Defaults to none.
+#- *vcl_content*: content of the instance's VCL file. Defaults to none.
+#- *storage*: array of backend "type[,options]" strings to be passed to "varnishd -s"
+#  since version 2.0 varnish support multiple storage files
+#- *params*: array of "key=value" strings to be passed to "varnishd -p"
+#  (run-time parameters). Defaults to none.
+#- *nfiles*: max number of open files (ulimit -n) allocated to varnishd,
+#  defaults to 131072.
+#- *memlock*: max memory lock size (ulimit -l) allocated to varnishd, defaults
+#  to 82000.
+#- *corelimit*: size of coredumps (ulimit -c). Usually "unlimited" or 0,
+#  defaults to 0.
+#- *varnishlog*: whether a varnishlog instance must be run together with
+#  varnishd. defaults to true.
+#
+#See varnishd(1) and /etc/{default,sysconfig}/varnish for more details.
+#
+#Notes:
+#- varnish's configuration will be reloaded when it changes, using
+#  /usr/local/sbin/vcl-reload.sh
+#
+#Requires:
+#- Class['varnish']
+#
 
-== Definition: varnish::instance
-
-Creates a running varnishd instance and configures it's different startup
-parameters. Optionnally a VCL configuration file can be provided. Have a look
-at http://varnish.projects.linpro.no/wiki/Introduction for more details.
-
-
-Parameters:
-- *address*: array of ip + port which varnish's http service should bindto,
-  defaults to all interfaces on port 80.
-- *admin_address*: address of varnish's admin console, defaults to localhost.
-- *admin_port*: port of varnish's admin console, defaults to 6082.
-- *backend*: location of the backend, in the "address:port" format. This is
-  passed to "varnishd -b". Defaults to none.
-- *vcl_file*: location of the instance's VCL file, located on puppet's
-  fileserver (puppet://host/module/path.vcl). This is passed to "varnishd -f".
-  Defaults to none.
-- *vcl_content*: content of the instance's VCL file. Defaults to none.
-- *storage*: array of backend "type[,options]" strings to be passed to "varnishd -s"
-  since version 2.0 varnish support multiple storage files
-- *params*: array of "key=value" strings to be passed to "varnishd -p"
-  (run-time parameters). Defaults to none.
-- *nfiles*: max number of open files (ulimit -n) allocated to varnishd,
-  defaults to 131072.
-- *memlock*: max memory lock size (ulimit -l) allocated to varnishd, defaults
-  to 82000.
-- *corelimit*: size of coredumps (ulimit -c). Usually "unlimited" or 0,
-  defaults to 0.
-- *varnishlog*: whether a varnishlog instance must be run together with
-  varnishd. defaults to true.
-
-See varnishd(1) and /etc/{default,sysconfig}/varnish for more details.
-
-Notes:
-- varnish's configuration will be reloaded when it changes, using
-  /usr/local/sbin/vcl-reload.sh
-
-Requires:
-- Class['varnish']
-
-*/
 define varnish::instance(
   $address=[':80'],
   $admin_address='localhost',
@@ -53,6 +53,7 @@ define varnish::instance(
   $corelimit='0',
   $varnishlog=true,
   $cliparams=undef,
+  $release='2',
 ) {
 
   # use a more comprehensive attribute name for ERB templates.
@@ -77,27 +78,23 @@ define varnish::instance(
     require => Package['varnish'],
   }
 
-  file { "/etc/varnish/${instance}/vcl_error.vcl":
+  file { "/etc/varnish/${instance}/production-${release}.vcl":
     ensure  => present,
-    content => template('varnish/site.d/vcl_error.erb'),
+    content => template("varnish/site.d/production-${release}.erb"),
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
-  file { "/etc/varnish/${instance}/vcl_fetch.vcl":
+
+  file { "/etc/varnish/${instance}/error.vcl":
     ensure  => present,
-    content => template('varnish/site.d/vcl_fetch.erb'),
+    content => template('varnish/site.d/error.erb'),
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
-  file { "/etc/varnish/${instance}/vcl_hash.vcl":
+
+  file { "/etc/varnish/${instance}/error-404.vcl":
     ensure  => present,
-    content => template('varnish/site.d/vcl_hash.erb'),
-    notify  => Service["varnish-${instance}"],
-    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
-  }
-  file { "/etc/varnish/${instance}/vcl_recv.vcl":
-    ensure  => present,
-    content => template('varnish/site.d/vcl_recv.erb'),
+    content => template('varnish/site.d/error-404.erb'),
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
