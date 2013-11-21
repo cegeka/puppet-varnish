@@ -99,6 +99,13 @@ define varnish::instance(
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
 
+  file { "/etc/varnish/${instance}/acl.vcl":
+    ensure  => present,
+    source  => 'puppet:///modules/varnish/site.d/acl.vcl',
+    notify  => Service["varnish-${instance}"],
+    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
+  }
+
   file { "/var/lib/varnish/${instance}":
     ensure  => directory,
     owner   => 'root',
