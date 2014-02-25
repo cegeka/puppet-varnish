@@ -13,7 +13,7 @@ FILE=$1
 
 # Hostname and management port
 # (defined in /etc/default/varnish or on startup)
-HOSTPORT="localhost:6082"
+HOSTPORT="localhost:<%= admin_port %>"
 NOW=`date +%F_%T`
 TMPDIR=`mktemp -d`
 
@@ -24,9 +24,7 @@ error()
 }
 
 echo "@@@ Checking VCL file syntax:"
-varnishd -d -s malloc -n "$TMPDIR" -f $FILE < /dev/null || error
-
-rm -f "$TMPDIR/_.vsl" && rmdir "$TMPDIR"
+varnishd -C -f $FILE || error
 
 echo -e "\n@@@ Loading new VCL file:"
 varnishadm -T $HOSTPORT vcl.load reload$NOW $FILE || error
