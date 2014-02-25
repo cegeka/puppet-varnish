@@ -46,10 +46,10 @@ class varnish($release=undef) {
     RedHat,CentOS,Amazon: {
       case $::operatingsystemrelease {
         /^5./: {
-          $epel_release = '2.0.6'
+          $epel_release = '2.0.6-2.el5'
         }
         /^6./: {
-          $epel_release = '2.1.5'
+          $epel_release = '2.1.5-1.el6'
         }
         default: {
           $epel_release = ''
