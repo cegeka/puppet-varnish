@@ -144,7 +144,7 @@ define varnish::instance(
     content => $real_varnishlog,
   }
 
-  file { '/usr/local/sbin/vcl-reload-${instance}.sh':
+  file { "/usr/local/sbin/vcl-reload-${instance}.sh":
     ensure  => present,
     owner   => 'root',
     group   => 'root',
@@ -160,7 +160,7 @@ define varnish::instance(
     restart => "/usr/local/sbin/vcl-reload-${instance}.sh /etc/varnish/${instance}.vcl",
     require => [
       File["/etc/init.d/varnish-${instance}"],
-      File['/usr/local/sbin/vcl-reload-${instance}.sh'],
+      File["/usr/local/sbin/vcl-reload-${instance}.sh"],
       File["varnish-${instance} startup config"],
       File["/var/lib/varnish/${instance}"],
       Service['varnish'],
