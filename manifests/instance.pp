@@ -54,6 +54,7 @@ define varnish::instance(
   $varnishlog=true,
   $cliparams=undef,
   $release='2',
+  $environment='production'
 ) {
 
   # use a more comprehensive attribute name for ERB templates.
@@ -78,9 +79,9 @@ define varnish::instance(
     require => Package['varnish'],
   }
 
-  file { "/etc/varnish/${instance}/production-${release}.vcl":
+  file { "/etc/varnish/${instance}/${environment}-${release}.vcl":
     ensure  => present,
-    content => template("varnish/site.d/production-${release}.erb"),
+    content => template("varnish/site.d/${environment}-${release}.erb"),
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
