@@ -34,14 +34,6 @@ class varnish($release=undef) {
     require   => Package['varnish'],
   }
 
-  file { '/usr/local/sbin/vcl-reload.sh':
-    ensure  => present,
-    owner   => 'root',
-    group   => 'root',
-    mode    => '0755',
-    content => template("${module_name}/usr/local/sbin/vcl-reload.sh.erb"),
-  }
-
   case $::operatingsystem {
     RedHat,CentOS,Amazon: {
       case $::operatingsystemrelease {

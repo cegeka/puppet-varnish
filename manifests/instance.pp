@@ -137,15 +137,23 @@ define varnish::instance(
     content => $real_varnishlog,
   }
 
+  file { '/usr/local/sbin/vcl-reload-${instance}.sh':
+    ensure  => present,
+    owner   => 'root',
+    group   => 'root',
+    mode    => '0755',
+    content => template("${module_name}/usr/local/sbin/vcl-reload.sh.erb"),
+  }
+
   service { "varnish-${instance}":
     ensure  => running,
     enable  => true,
     pattern => "/var/run/varnish-${instance}.pid",
     # reload VCL file when changed, without restarting the varnish service.
-    restart => "/usr/local/sbin/vcl-reload.sh /etc/varnish/${instance}.vcl",
+    restart => "/usr/local/sbin/vcl-reload-${instance}.sh /etc/varnish/${instance}.vcl",
     require => [
       File["/etc/init.d/varnish-${instance}"],
-      File['/usr/local/sbin/vcl-reload.sh'],
+      File['/usr/local/sbin/vcl-reload-${instance}.sh'],
       File["varnish-${instance} startup config"],
       File["/var/lib/varnish/${instance}"],
       Service['varnish'],
