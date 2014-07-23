@@ -1,7 +1,7 @@
 # Default backend definition. Set this to point to your content server.
 # all paths relative to varnish option vcl_dir
 
-include "/etc/varnish/<%= instance %>/acl.vcl";
+include "/etc/varnish/<%= @instance %>/acl.vcl";
 
 # Handle the HTTP request received by the client
 sub vcl_recv {
@@ -273,10 +273,10 @@ sub vcl_error {
         return(restart);
     } elsif (obj.status >= 400 && obj.status <= 499 ) {
         # use 404 error page for 4xx error
-        include "/etc/varnish/<%= instance %>/error-404.vcl";
+        include "/etc/varnish/<%= @instance %>/error-404.vcl";
     } elsif (obj.status <= 200 && obj.status >= 299 ) {
         # for other errors (not 5xx, not 4xx and not 2xx)
-        include "/etc/varnish/<%= instance %>/error.vcl";
+        include "/etc/varnish/<%= @instance %>/error.vcl";
     } elseif (obj.status == 720) {
         # We use this special error status 720 to force redirects with 301 (permanent) redirects
         # To use this, call the following from anywhere in vcl_recv: error 720 "http://host/new.html"
@@ -290,7 +290,7 @@ sub vcl_error {
         set obj.http.Location = obj.response;
         return (deliver);
     } else {
-      include "/etc/varnish/<%= instance %>/error.vcl";
+      include "/etc/varnish/<%= @instance %>/error.vcl";
     }
 
     return (deliver);
@@ -303,5 +303,3 @@ sub vcl_init {
 sub vcl_fini {
     return (ok);
 }
-
-
