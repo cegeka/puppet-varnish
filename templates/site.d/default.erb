@@ -1,8 +1,12 @@
 #file manager by puppet, do not edit
 backend default {
-<% options.each do |option| %>
+<% @options.each do |option| %>
   .<%= option %>;
 <% end %>
 }
 
-include "/etc/varnish/<%= instance %>/<%= environment %>-<%= release %>.vcl";
+include "/etc/varnish/<%= @instance %>/<%= @environment %>-<%= @release %>.vcl";
+# include "/etc/varnish/<%= @instance %>/vcl_error.vcl";
+# include "/etc/varnish/<%= @instance %>/vcl_fetch.vcl";
+# include "/etc/varnish/<%= @instance %>/vcl_hash.vcl";
+# include "/etc/varnish/<%= @instance %>/vcl_recv.vcl";
