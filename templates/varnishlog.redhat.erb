@@ -5,7 +5,7 @@
 # chkconfig: - 90 10
 # description: Varnish logging daemon
 # processname: varnishlog
-# config: 
+# config:
 # pidfile: /var/run/varnish/varnishlog.pid
 
 ### BEGIN INIT INFO
@@ -20,17 +20,17 @@
 . /etc/init.d/functions
 
 retval=0
-pidfile="/var/run/varnishlog-<%= instance %>.pid"
-lockfile="/var/lock/subsys/varnishlog-<%= instance %>"
-logfile="/var/log/varnish/varnish-<%= instance %>.log"
+pidfile="/var/run/varnishlog-<%= @instance %>.pid"
+lockfile="/var/lock/subsys/varnishlog-<%= @instance %>"
+logfile="/var/log/varnish/varnish-<%= @instance %>.log"
 
 exec="/usr/bin/varnishlog"
 prog="varnishlog"
 
-DAEMON_OPTS="-a -w $logfile -D -P $pidfile -n <%= instance %>"
+DAEMON_OPTS="-a -w $logfile -D -P $pidfile -n <%= @instance %>"
 
 # Include varnish defaults
-[ -e /etc/sysconfig/varnishlog-<%= instance %> ] && . /etc/sysconfig/varnishlog-<%= instance %>
+[ -e /etc/sysconfig/varnishlog-<%= @instance %> ] && . /etc/sysconfig/varnishlog-<%= @instance %>
 
 start() {
 
@@ -42,7 +42,7 @@ start() {
 
 	echo -n "Starting varnish logging daemon: "
 
-	daemon --pidfile $pidfile $exec "$DAEMON_OPTS" 
+	daemon --pidfile $pidfile $exec "$DAEMON_OPTS"
 	echo
 	return $retval
 }
