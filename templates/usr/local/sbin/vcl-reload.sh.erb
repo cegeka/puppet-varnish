@@ -13,7 +13,7 @@ FILE=$1
 
 # Hostname and management port
 # (defined in /etc/default/varnish or on startup)
-HOSTPORT="localhost:<%= admin_port %>"
+HOSTPORT="localhost:<%= @admin_port %>"
 NOW=`date +%F_%T`
 TMPDIR=`mktemp -d`
 
