@@ -54,7 +54,8 @@ define varnish::instance(
   $varnishlog=true,
   $cliparams=undef,
   $release='2',
-  $environment='production'
+  $environment='production',
+  $http_authorization_cache_disabled=true
 ) {
 
   # use a more comprehensive attribute name for ERB templates.
