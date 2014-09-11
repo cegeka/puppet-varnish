@@ -101,6 +101,10 @@ sub vcl_recv {
     # Remove the AddThis cookies
     set req.http.Cookie = regsuball(req.http.Cookie, "__atuvc=[^;]+(; )?", "");
 
+    # Remove custom cookies
+    set req.http.Cookie = regsuball(req.http.Cookie, "language=[^;]+(; )?", "");
+    set req.http.Cookie = regsuball(req.http.Cookie, "cookie-agreed=[^;]+(; )?", "");
+
     # Remove a ";" prefix in the cookie if present
     set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
 
