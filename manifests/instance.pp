@@ -108,6 +108,11 @@ define varnish::instance(
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
 
+  file { ["/etc/varnish/${instance}/custom-vcl.recv.vcl","/etc/varnish/${instance}/custom-vcl.fetch.vcl"]:
+    ensure  => present,
+    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
+  }
+
   file { "/var/lib/varnish/${instance}":
     ensure  => directory,
     owner   => 'root',
