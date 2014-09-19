@@ -108,6 +108,23 @@ define varnish::instance(
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
 
+  include concat::setup
+  concat { "/etc/varnish/${instance}/recv.vcl": }
+  concat { "/etc/varnish/${instance}/pass.vcl": }
+
+  varnish::vcl { 'empty-recv-vcl':
+    type     => 'recv',
+    prio     => 10,
+    rules    => ['# File managed by puppet'],
+    instance => $instance
+  }
+  varnish::vcl { 'empty-pass-vcl':
+    type     => 'pass',
+    prio     => 10,
+    rules    => ['# File managed by puppet'],
+    instance => $instance
+  }
+
   file { "/var/lib/varnish/${instance}":
     ensure  => directory,
     owner   => 'root',
@@ -164,6 +181,8 @@ define varnish::instance(
       File["/usr/local/sbin/vcl-reload-${instance}.sh"],
       File["varnish-${instance} startup config"],
       File["/var/lib/varnish/${instance}"],
+      Varnish::Vcl['empty-recv-vcl'],
+      Varnish::Vcl['empty-pass-vcl'],
       Service['varnish'],
       Service['varnishlog']
     ],
