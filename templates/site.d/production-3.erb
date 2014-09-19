@@ -170,7 +170,7 @@ sub vcl_recv {
 
 
     # Include custom vcl_recv logic
-    include "/etc/varnish/<%= @instance %>/custom-vcl.recv.vcl";
+    include "/etc/varnish/<%= @instance %>/recv.vcl";
 
     return (lookup);
 }
@@ -232,7 +232,7 @@ sub vcl_miss {
 # Handle the HTTP request coming from our backend
 sub vcl_fetch {
     # Include custom vcl_fetch logic
-    include "/etc/varnish/<%= @instance %>/custom-vcl.fetch.vcl";
+    include "/etc/varnish/<%= @instance %>/fetch.vcl";
 
     # Parse ESI request and remove Surrogate-Control header
     if (beresp.http.Surrogate-Control ~ "ESI/1.0") {

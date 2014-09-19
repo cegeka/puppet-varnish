@@ -13,3 +13,13 @@ varnish::instance { 'site.example.com':
   storage     => ['file,/var/lib/varnish/varnish_storage.bin,1G'],
   release     => '3',
 }
+
+varnish::vcl { 'allow-backend':
+  type     => 'recv',
+  rules    => [
+    'if (req.url ~ "^/api/") {
+      return (pass);
+    }'
+  ],
+  instance => 'site.example.com',
+}
