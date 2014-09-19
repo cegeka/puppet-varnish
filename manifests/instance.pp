@@ -108,9 +108,21 @@ define varnish::instance(
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
 
-  file { ["/etc/varnish/${instance}/custom-vcl.recv.vcl","/etc/varnish/${instance}/custom-vcl.fetch.vcl"]:
-    ensure  => present,
-    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
+  include concat::setup
+  concat { "/etc/varnish/${instance}/recv.vcl": }
+  concat { "/etc/varnish/${instance}/pass.vcl": }
+
+  varnish::vcl { 'empty-recv-vcl':
+    type     => 'recv',
+    prio     => 10,
+    rules    => ['# File managed by puppet'],
+    instance => $instance
+  }
+  varnish::vcl { 'empty-pass-vcl':
+    type     => 'pass',
+    prio     => 10,
+    rules    => ['# File managed by puppet'],
+    instance => $instance
   }
 
   file { "/var/lib/varnish/${instance}":
