@@ -5,9 +5,8 @@ define varnish::vcl (
   $instance = undef,
 ) {
 
-  #concat { "/etc/varnish/${instance}/${type}.vcl": }
-  concat::fragment { "${varnish::vcl::title}-${varnish::vcl::rule}-vcl":
-    target  => "/etc/varnish/${varnish::vcl::instance}/${varnish::vcl::type}.vcl",
+  concat::fragment { "${title}-${rule}-vcl":
+    target  => "/etc/varnish/${instance}/${type}.vcl",
     content => template('varnish/site.d/custom-vcl.erb'),
     order   => $prio,
   }
