@@ -181,6 +181,8 @@ define varnish::instance(
       File["/usr/local/sbin/vcl-reload-${instance}.sh"],
       File["varnish-${instance} startup config"],
       File["/var/lib/varnish/${instance}"],
+      Varnish::Vcl['empty-recv-vcl'],
+      Varnish::Vcl['empty-pass-vcl'],
       Service['varnish'],
       Service['varnishlog']
     ],
