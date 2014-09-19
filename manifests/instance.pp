@@ -111,15 +111,22 @@ define varnish::instance(
   include concat::setup
   concat { "/etc/varnish/${instance}/recv.vcl": }
   concat { "/etc/varnish/${instance}/pass.vcl": }
+  concat { "/etc/varnish/${instance}/fetch.vcl": }
 
-  varnish::vcl { 'empty-recv-vcl':
+  varnish::vcl { 'initial-recv-vcl':
     type     => 'recv',
     prio     => 10,
     rules    => ['# File managed by puppet'],
     instance => $instance
   }
-  varnish::vcl { 'empty-pass-vcl':
+  varnish::vcl { 'initial-pass-vcl':
     type     => 'pass',
+    prio     => 10,
+    rules    => ['# File managed by puppet'],
+    instance => $instance
+  }
+  varnish::vcl { 'initial-fetch-vcl':
+    type     => 'fetch',
     prio     => 10,
     rules    => ['# File managed by puppet'],
     instance => $instance
