@@ -9,7 +9,7 @@ define varnish::vcl (
     target  => "/etc/varnish/${instance}/${type}.vcl",
     content => template('varnish/site.d/custom-vcl.erb'),
     order   => $prio,
-    notify   => Service["varnish-${instance}"],
+    notify  => Service["varnish-${instance}"],
   }
 
 }
