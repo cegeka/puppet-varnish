@@ -5,10 +5,11 @@ define varnish::vcl (
   $instance = undef,
 ) {
 
-  concat::fragment { "${title}-${rule}-vcl":
+  concat::fragment { "${instance}-${title}-${type}-vcl":
     target  => "/etc/varnish/${instance}/${type}.vcl",
     content => template('varnish/site.d/custom-vcl.erb'),
     order   => $prio,
+    notify   => Service["varnish-${instance}"],
   }
 
 }
