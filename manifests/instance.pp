@@ -108,7 +108,6 @@ define varnish::instance(
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
 
-  include concat::setup
   concat { "/etc/varnish/${instance}/recv.vcl": }
   concat { "/etc/varnish/${instance}/pass.vcl": }
   concat { "/etc/varnish/${instance}/fetch.vcl": }
