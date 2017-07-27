@@ -1,5 +1,5 @@
 = puppet-varnish module
 
-{<img src='https://codex.cegeka.be/jenkins/job/puppet-varnish/badge/icon' />}[https://codex.cegeka.be/jenkins/job/puppet-varnish/]
+{<img src='https://jenkins-iac.cegeka.be/job/puppet-varnish/badge/icon' />}[https://jenkins-iac.cegeka.be/job/puppet-varnish/]
 
 This is the varnish module.
