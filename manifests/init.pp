@@ -35,7 +35,7 @@ class varnish($release=undef) {
   }
 
   case $::operatingsystem {
-    RedHat,CentOS,Amazon: {
+    'RedHat','CentOS','Amazon': {
       case $::operatingsystemrelease {
         /^5./: {
           $epel_release = '2.0.6-2.el5'
