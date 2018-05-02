@@ -73,12 +73,40 @@ define varnish::instance(
     content => template('varnish/sysconfig/varnish.erb'),
     name    => $varnishsysconfig,
   }
+  
+ if  ( $::operatingsystem =~ /RedHat|CentOS/ ) and ($::operatingsystemmajrelease =~ /7/ ) {
+   notice('YES')
+   $service_script = "/usr/lib/systemd/system/varnish-${instance}.service"
+   file { $service_script:
+     ensure => present,
+     mode   => '0755',
+     owner  => 'root',
+     group  => 'root',
+     source => 'puppet:///modules/varnish/etc/init.d/varnish-instance.service',
+     notify => Exec["daemon-reload"]
+   }
+ } else {
+   notice('NO')
+   $service_script = "/etc/init.d/varnish-${instance}"
+   file { $service_script:
+     ensure  => present,
+     mode    => '0755',
+     owner   => 'root',
+     group   => 'root',
+     content => $varnishinitd,
+   }
+ }
 
+  if $release != 4 {
+    $instance_template = 'varnish/site.d/default.erb'
+  } else {
+    $instance_template = 'varnish/site.d/default-4.erb'
+  }
   file { "/etc/varnish/${instance}.vcl":
     ensure  => present,
-    content => template('varnish/site.d/default.erb'),
+    content => template($instance_template),
     notify  => Service["varnish-${instance}"],
-    require => Package['varnish'],
+    require => [Package['varnish'],File[$service_script]]
   }
 
   file { "/etc/varnish/${instance}/${environment}-${release}.vcl":
@@ -101,12 +129,20 @@ define varnish::instance(
     notify  => Service["varnish-${instance}"],
     require => [Package['varnish'],File["/etc/varnish/${instance}"]],
   }
-
-  file { "/etc/varnish/${instance}/acl.vcl":
-    ensure  => present,
-    source  => 'puppet:///modules/varnish/site.d/acl.vcl',
-    notify  => Service["varnish-${instance}"],
-    require => [Package['varnish'],File["/etc/varnish/${instance}"]],
+  if $release != 4 {
+    file { "/etc/varnish/${instance}/acl.vcl":
+      ensure  => present,
+      source  => 'puppet:///modules/varnish/site.d/acl.vcl',
+      notify  => Service["varnish-${instance}"],
+      require => [Package['varnish'],File["/etc/varnish/${instance}"]],
+    }
+  } else {
+    file { "/etc/varnish/${instance}/acl4.vcl":
+      ensure  => present,
+      source  => 'puppet:///modules/varnish/site.d/acl.vcl',
+      notify  => Service["varnish-${instance}"],
+      require => [Package['varnish'],File["/etc/varnish/${instance}"]],
+    }
   }
 
   concat { "/etc/varnish/${instance}/recv.vcl": }
@@ -148,14 +184,6 @@ define varnish::instance(
     /RedHat|Fedora|CentOS|Amazon/   => template('varnish/varnish.redhat.erb'),
   }
 
-  file { "/etc/init.d/varnish-${instance}":
-    ensure  => present,
-    mode    => '0755',
-    owner   => 'root',
-    group   => 'root',
-    content => $varnishinitd,
-  }
-
   $real_varnishlog = $::operatingsystem ? {
     /Debian|Ubuntu|kFreeBSD/        => template('varnish/varnishlog.debian.erb'),
     /RedHat|Fedora|CentOS|Amazon/   => template('varnish/varnishlog.redhat.erb'),
@@ -184,7 +212,7 @@ define varnish::instance(
     # reload VCL file when changed, without restarting the varnish service.
     restart => "/usr/local/sbin/vcl-reload-${instance}.sh /etc/varnish/${instance}.vcl",
     require => [
-      File["/etc/init.d/varnish-${instance}"],
+      File[$service_script],
       File["/usr/local/sbin/vcl-reload-${instance}.sh"],
       File["varnish-${instance} startup config"],
       File["/var/lib/varnish/${instance}"],
@@ -218,5 +246,10 @@ define varnish::instance(
       hasstatus => false,
       require   => File["/etc/init.d/varnishlog-${instance}"],
     }
+  }
+  exec { "daemon-reload":
+    command     => '/usr/bin/systemctl daemon-reload',
+    user        => 'root',
+    refreshonly => true,
   }
 }
