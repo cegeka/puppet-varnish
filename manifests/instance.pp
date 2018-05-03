@@ -68,6 +68,16 @@ define varnish::instance(
     /RedHat|Fedora|CentOS|Amazon/   => "/etc/sysconfig/varnish-${instance}",
   }
 
+  $varnishinitd = $::operatingsystem ? {
+    /Debian|Ubuntu|kFreeBSD/        => template('varnish/varnish.debian.erb'),
+    /RedHat|Fedora|CentOS|Amazon/   => template('varnish/varnish.redhat.erb'),
+  }
+
+  $real_varnishlog = $::operatingsystem ? {
+    /Debian|Ubuntu|kFreeBSD/        => template('varnish/varnishlog.debian.erb'),
+    /RedHat|Fedora|CentOS|Amazon/   => template('varnish/varnishlog.redhat.erb'),
+  }
+
   file { "varnish-${instance} startup config":
     ensure  => present,
     content => template('varnish/sysconfig/varnish.erb'),
@@ -75,25 +85,43 @@ define varnish::instance(
   }
   
  if  ( $::operatingsystem =~ /RedHat|CentOS/ ) and ($::operatingsystemmajrelease =~ /7/ ) {
-   notice('YES')
    $service_script = "/usr/lib/systemd/system/varnish-${instance}.service"
    file { $service_script:
-     ensure => present,
-     mode   => '0755',
-     owner  => 'root',
-     group  => 'root',
-     source => 'puppet:///modules/varnish/etc/init.d/varnish-instance.service',
-     notify => Exec["daemon-reload"]
+     ensure  => present,
+     mode    => '0755',
+     owner   => 'root',
+     group   => 'root',
+     content => template('varnish/varnish-instance.service.erb'),
+     notify  => Exec["daemon-reload"]
+   }
+
+   $varnishlog_service_script="/usr/lib/systemd/system/varnishlog-${instance}.service"
+
+   file { $varnishlog_service_script:
+     ensure  => present,
+     mode    => '0755',
+     owner   => 'root',
+     group   => 'root',
+     content => template('varnish/varnishlog-instance.service.erb'),
+     notify  => Exec["daemon-reload"]
    }
  } else {
-   notice('NO')
    $service_script = "/etc/init.d/varnish-${instance}"
+
    file { $service_script:
      ensure  => present,
      mode    => '0755',
      owner   => 'root',
      group   => 'root',
      content => $varnishinitd,
+   }
+   $varnishlog_service_script="/etc/init.d/varnishlog-${instance}"
+   file { $varnishlog_service_script:
+     ensure  => present,
+     mode    => '0755',
+     owner   => 'root',
+     group   => 'root',
+     content => template($real_varnishlog)
    }
  }
 
@@ -179,24 +207,6 @@ define varnish::instance(
     require => Package['varnish'],
   }
 
-  $varnishinitd = $::operatingsystem ? {
-    /Debian|Ubuntu|kFreeBSD/        => template('varnish/varnish.debian.erb'),
-    /RedHat|Fedora|CentOS|Amazon/   => template('varnish/varnish.redhat.erb'),
-  }
-
-  $real_varnishlog = $::operatingsystem ? {
-    /Debian|Ubuntu|kFreeBSD/        => template('varnish/varnishlog.debian.erb'),
-    /RedHat|Fedora|CentOS|Amazon/   => template('varnish/varnishlog.redhat.erb'),
-  }
-
-  file { "/etc/init.d/varnishlog-${instance}":
-    ensure  => present,
-    mode    => '0755',
-    owner   => 'root',
-    group   => 'root',
-    content => $real_varnishlog,
-  }
-
   file { "/usr/local/sbin/vcl-reload-${instance}.sh":
     ensure  => present,
     owner   => 'root',
@@ -232,7 +242,7 @@ define varnish::instance(
       pattern   => "/var/run/varnishlog-${instance}.pid",
       hasstatus => false,
       require   => [
-        File["/etc/init.d/varnishlog-${instance}"],
+        File[$varnishlog_service_script],
         Service["varnish-${instance}"],
       ],
     }
@@ -244,7 +254,7 @@ define varnish::instance(
       enable    => false,
       pattern   => "/var/run/varnishlog-${instance}.pid",
       hasstatus => false,
-      require   => File["/etc/init.d/varnishlog-${instance}"],
+      require   => File[$varnishlog_service_script],
     }
   }
   exec { "daemon-reload":

@@ -23,7 +23,7 @@ LimitMEMLOCK=82000
 # Maximum size of the corefile.
 LimitCORE=infinity
 
-EnvironmentFile=/etc/sysconfig/varnish-instance01
+EnvironmentFile=/etc/sysconfig/varnish-<%= @instance %>
 
 Type=forking
 PIDFile=/var/run/varnish.pid
