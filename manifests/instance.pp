@@ -83,47 +83,47 @@ define varnish::instance(
     content => template('varnish/sysconfig/varnish.erb'),
     name    => $varnishsysconfig,
   }
-  
- if  ( $::operatingsystem =~ /RedHat|CentOS/ ) and ($::operatingsystemmajrelease =~ /7/ ) {
-   $service_script = "/usr/lib/systemd/system/varnish-${instance}.service"
-   file { $service_script:
-     ensure  => present,
-     mode    => '0755',
-     owner   => 'root',
-     group   => 'root',
-     content => template('varnish/varnish-instance.service.erb'),
-     notify  => Exec["daemon-reload"]
-   }
 
-   $varnishlog_service_script="/usr/lib/systemd/system/varnishlog-${instance}.service"
+  if  ( $::operatingsystem =~ /RedHat|CentOS/ ) and ($::operatingsystemmajrelease =~ /7/ ) {
+    $service_script = "/usr/lib/systemd/system/varnish-${instance}.service"
+    file { $service_script:
+      ensure  => present,
+      mode    => '0755',
+      owner   => 'root',
+      group   => 'root',
+      content => template('varnish/varnish-instance.service.erb'),
+      notify  => Exec['daemon-reload']
+    }
 
-   file { $varnishlog_service_script:
-     ensure  => present,
-     mode    => '0755',
-     owner   => 'root',
-     group   => 'root',
-     content => template('varnish/varnishlog-instance.service.erb'),
-     notify  => Exec["daemon-reload"]
-   }
- } else {
-   $service_script = "/etc/init.d/varnish-${instance}"
+    $varnishlog_service_script="/usr/lib/systemd/system/varnishlog-${instance}.service"
 
-   file { $service_script:
-     ensure  => present,
-     mode    => '0755',
-     owner   => 'root',
-     group   => 'root',
-     content => $varnishinitd,
-   }
-   $varnishlog_service_script="/etc/init.d/varnishlog-${instance}"
-   file { $varnishlog_service_script:
-     ensure  => present,
-     mode    => '0755',
-     owner   => 'root',
-     group   => 'root',
-     content => template($real_varnishlog)
-   }
- }
+    file { $varnishlog_service_script:
+      ensure  => present,
+      mode    => '0755',
+      owner   => 'root',
+      group   => 'root',
+      content => template('varnish/varnishlog-instance.service.erb'),
+      notify  => Exec['daemon-reload']
+    }
+  } else {
+    $service_script = "/etc/init.d/varnish-${instance}"
+
+    file { $service_script:
+      ensure  => present,
+      mode    => '0755',
+      owner   => 'root',
+      group   => 'root',
+      content => $varnishinitd,
+    }
+    $varnishlog_service_script="/etc/init.d/varnishlog-${instance}"
+    file { $varnishlog_service_script:
+      ensure  => present,
+      mode    => '0755',
+      owner   => 'root',
+      group   => 'root',
+      content => template($real_varnishlog)
+    }
+  }
 
   if $release != 4 {
     $instance_template = 'varnish/site.d/default.erb'
@@ -257,7 +257,7 @@ define varnish::instance(
       require   => File[$varnishlog_service_script],
     }
   }
-  exec { "daemon-reload":
+  exec { 'daemon-reload':
     command     => '/usr/bin/systemctl daemon-reload',
     user        => 'root',
     refreshonly => true,
