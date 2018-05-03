@@ -116,12 +116,13 @@ define varnish::instance(
       content => $varnishinitd,
     }
     $varnishlog_service_script="/etc/init.d/varnishlog-${instance}"
+
     file { $varnishlog_service_script:
       ensure  => present,
       mode    => '0755',
       owner   => 'root',
       group   => 'root',
-      content => template($real_varnishlog)
+      content => $real_varnishlog
     }
   }
 
