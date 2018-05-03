@@ -165,9 +165,9 @@ define varnish::instance(
       require => [Package['varnish'],File["/etc/varnish/${instance}"]],
     }
   } else {
-    file { "/etc/varnish/${instance}/acl4.vcl":
+    file { "/etc/varnish/${instance}/acl.vcl":
       ensure  => present,
-      source  => 'puppet:///modules/varnish/site.d/acl.vcl',
+      source  => 'puppet:///modules/varnish/site.d/acl4.vcl',
       notify  => Service["varnish-${instance}"],
       require => [Package['varnish'],File["/etc/varnish/${instance}"]],
     }
