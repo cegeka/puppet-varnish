@@ -49,4 +49,7 @@ DAEMON_OPTS="-n <%= @name %> \
 <% end -%>
 <% if @cliparams %><% @cliparams.each do |param| -%>
              -p <%= param %> \
-<% end -%><% end%>"
+<% end -%><% end -%>
+<% if @secret_path -%>
+             -S <%= @secret_path %> \
+<% end -%>"

@@ -56,7 +56,8 @@ define varnish::instance(
   $release='2',
   $environment='production',
   $http_authorization_cache_disabled=true,
-  $google_analytics_removal_enabled=true
+  $google_analytics_removal_enabled=true,
+  $secret_path = undef
 ) {
 
   # use a more comprehensive attribute name for ERB templates.
