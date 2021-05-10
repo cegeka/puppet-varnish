@@ -1,0 +1,14 @@
+#file manager by puppet, do not edit
+vcl 4.1;
+# Based on: https://github.com/mattiasgeniar/varnish-6.0-configuration-templates/blob/master/default.vcl
+
+import std;
+import directors;
+
+backend <%= @instance %> {
+<% @options.each do |option| -%>
+  .<%= option %>;
+<% end %>
+}
+
+include "/etc/varnish/<%= @instance %>/<%= @environment %>-<%= @release %>.vcl";

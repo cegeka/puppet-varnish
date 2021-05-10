@@ -1,0 +1,24 @@
+# file managed by puppet
+DAEMON_OPTS="-n <%= @name %> \
+             -a <%= @address.join(',') %>,HTTP \
+             -T <%= @admin_address %>:<%= @admin_port %> \
+             -p feature=+http2 \
+<% if @storage == [] -%>
+             -s file,/var/lib/varnish/<%= @name %>/varnish_storage.bin,1G \
+<% else -%>
+<% @storage.each do |storage| -%>
+             -s <%= storage %> \
+<% end -%>
+<% end -%>
+            -f /etc/varnish/<%= @name %>.vcl \
+<% if @backend -%>
+             -b <%= @backend %> \
+<% end -%>
+<% if @cliparams %><% @cliparams.each do |param| -%>
+             -p <%= param %> \
+<% end -%><% end -%>
+<% if @secret_path -%>
+             -S <%= @secret_path %> \
+<% end -%>"
+
+RELOAD_OPTS="-n <%= @name %>"
