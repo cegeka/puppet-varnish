@@ -14,8 +14,12 @@ class varnish($release=undef) {
     $real_release = $epel_release
   }
 
-  package { ['varnish','jemalloc']:
+  package { 'varnish']:
     ensure => $real_release,
+  }
+
+  package { 'jemalloc':
+    ensure => present
   }
 
   service { 'varnish':
