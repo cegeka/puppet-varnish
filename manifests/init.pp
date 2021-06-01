@@ -14,7 +14,7 @@ class varnish($release=undef) {
     $real_release = $epel_release
   }
 
-  package { 'varnish']:
+  package { 'varnish':
     ensure => $real_release,
   }
 
