@@ -18,6 +18,11 @@
 #  fileserver (puppet://host/module/path.vcl). This is passed to "varnishd -f".
 #  Defaults to none.
 #- *vcl_content*: content of the instance's VCL file. Defaults to none.
+#- *enable_secret*: enable secret file in the instance's configuration.
+#   Defaults to false.
+#- *secret_file*: path to the secret file to use. Defaults to
+#   /etc/varnish/secret.
+#- *varnish_secret*: content of the secret_file
 #- *storage*: array of backend "type[,options]" strings to be passed to "varnishd -s"
 #  since version 2.0 varnish support multiple storage files
 #- *params*: array of "key=value" strings to be passed to "varnishd -p"
@@ -46,6 +51,9 @@ define varnish::instance(
   $admin_address='localhost',
   $admin_port='6082',
   $backend=undef,
+  $enable_secret=false,
+  $secret_file='/etc/varnish/secret',
+  $varnish_secret='default',
   $storage=[],
   $options=[],
   $nfiles='131072',
@@ -56,8 +64,7 @@ define varnish::instance(
   $release='2',
   $environment='production',
   $http_authorization_cache_disabled=true,
-  $google_analytics_removal_enabled=true,
-  $secret_path = undef
+  $google_analytics_removal_enabled=true
 ) {
 
   # use a more comprehensive attribute name for ERB templates.
@@ -210,6 +217,14 @@ define varnish::instance(
     content => template("${module_name}/usr/local/sbin/vcl-reload.sh.erb"),
   }
 
+  if ($enable_secret) {
+    file { $secret_file :
+      ensure => present,
+      mode => '0640',
+      content => $varnish_secret,
+      notify => Service["varnish-${instance}"]
+    }
+  }
   service { "varnish-${instance}":
     ensure  => running,
     enable  => true,
