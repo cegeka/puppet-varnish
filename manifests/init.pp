@@ -51,23 +51,6 @@ class varnish($release=undef) {
           $epel_release = ''
         }
       }
-      # By default RPM package fail to send HUP to varnishlog process, and don't
-      # bother compressing rotated files. This fixes these issues, waiting for
-      # this bug to get corrected upstream:
-      # https://bugzilla.redhat.com/show_bug.cgi?id=554745
-      augeas { 'logrotate config for varnishlog and varnishncsa':
-        incl    => '/etc/logrotate.d/varnish',
-        lens    => 'Logrotate.lns',
-        changes => [
-          'set rule/schedule daily',
-          'set rule/rotate 7',
-          'set rule/compress compress',
-          'set rule/size 40M',
-          'set rule/delaycompress delaycompress',
-          'set rule/postrotate "for service in varnishlog varnishncsa varnishd; do if /usr/bin/pgrep -P 1 $service >/dev/null; then /usr/bin/pkill -HUP $service 2>/dev/null; fi; done"',
-        ],
-        require => Package['varnish'],
-      }
     }
     default: {}
   }
